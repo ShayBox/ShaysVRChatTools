@@ -5,74 +5,112 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using VRC.SDKBase.Editor;
 
-public class ShaysUploadTool : EditorWindow {
-	public bool isWaitingForPlaymode = false;
-	public GameObject uploadObject = null;
+namespace ShayBox {
 
-	public void OnEnable() => EditorApplication.playModeStateChanged += PlayModeStateChanged;
-	public void OnDisable() => EditorApplication.playModeStateChanged -= PlayModeStateChanged;
+	public class ShaysUploadTool : EditorWindow {
 
-	public void PlayModeStateChanged(PlayModeStateChange state) {
-		if (state is PlayModeStateChange.EnteredEditMode)
-			isWaitingForPlaymode = false;
-	}
+#if UNITY_STANDALONE_WIN
+		public static readonly string PLATFORM = "PC";
+		public static readonly string SUFFIX = " (PC)";
+#elif UNITY_ANDROID
+		public static readonly string PLATFORM = "Quest";
+		public static readonly string SUFFIX = " (Quest)";
+#endif
 
-	[MenuItem(itemName: "Window/Shays Upload Tool")]
-	public static void ShowWindow() => GetWindow<ShaysUploadTool>(title: "Shays Upload Tool");
+		[MenuItem(itemName: "Window/Shays Upload Tool")]
+		public static void ShowWindow() => GetWindow<ShaysUploadTool>(title: "Shays Upload Tool");
 
-	// GUI Render Loop
-	public void OnGUI() {
-		Scene scene = SceneManager.GetActiveScene();
-		GameObject[] allObjs = scene.GetRootGameObjects();
-		GameObject[] aviObjs = allObjs.Where(predicate: o => o.activeInHierarchy && o.GetComponent(type: "VRCAvatarDescriptor") != null).ToArray();
-		if (aviObjs.Length < 1) {
-			GUILayout.Label(text: "No Avatars Found!");
-			return;
-		}
+		public void OnEnable() => EditorApplication.playModeStateChanged += PlayModeStateChanged;
+		public void OnDisable() => EditorApplication.playModeStateChanged -= PlayModeStateChanged;
 
-		if (GUILayout.Button(text: "Build & Test Avatar(s)"))
-			foreach (GameObject obj in aviObjs)
-				VRC_SdkBuilder.RunExportAndTestAvatarBlueprint(obj);
-
-		foreach (GameObject obj in aviObjs)
-			if (GUILayout.Button(text: "Build & Upload " + obj.name)) {
-				isWaitingForPlaymode = true;
-				uploadObject = obj;
-				VRC_SdkBuilder.RunExportAndUploadAvatarBlueprint(obj);
-			}
-	}
-
-	// Game Update Loop
-	public void Update() {
-		if (EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode) {
-			// Play Mode
-			// Delay upload and prevent uploading more than once
-			if (Time.frameCount > 150 && isWaitingForPlaymode)
+		public bool isWaitingForPlaymode = false;
+		public void PlayModeStateChanged(PlayModeStateChange state) {
+			if (state is PlayModeStateChange.EnteredEditMode) {
 				isWaitingForPlaymode = false;
-			else
-				return;
+			}
+		}
 
+		public GameObject uploadObject = null;
+
+		// Window Render Loop
+		public void OnGUI() {
+			// Variables
 			Scene scene = SceneManager.GetActiveScene();
-			GameObject[] allObjs = scene.GetRootGameObjects();
-			GameObject VRCSDK = allObjs.Where(predicate: o => o.name.Equals(value: "VRCSDK")).First();
-			if (VRCSDK == null) {
-				GUILayout.Label(text: "No VRCSDK Object Found!");
+			GameObject[] sceneObjects = scene.GetRootGameObjects();
+			GameObject[] sceneAvatarObjects = sceneObjects.Where(predicate: obj => obj.activeInHierarchy && obj.GetComponent(type: "VRCAvatarDescriptor") != null).ToArray();
+
+			// Pre-conditions
+			if (sceneAvatarObjects.Length < 1) {
+				GUILayout.Label(text: "No Avatars Found");
 				return;
 			}
 
-			// Unnecessary but why not
-			Toggle[] toggles = VRCSDK.GetComponentsInChildren<Toggle>();
-			Toggle warrantToggle = toggles.First(predicate: t => t.name.Equals(value: "ToggleWarrant"));
-			warrantToggle.isOn = true;
-
-			Button[] buttons = VRCSDK.GetComponentsInChildren<Button>(includeInactive: true);
-			Button uploadButton = buttons.First(predicate: b => b.name.Equals(value: "UploadButton"));
-			if (uploadButton != null)
-				uploadButton.onClick.Invoke();
-		} else if (uploadObject != null) {
-			// Edit Mode
-			uploadObject.SetActive(value: false);
-			uploadObject = null;
+			foreach (GameObject obj in sceneAvatarObjects) {
+				if (GUILayout.Button(text: "Build & Upload " + obj.name)) {
+					isWaitingForPlaymode = true;
+					uploadObject = obj;
+					VRC_SdkBuilder.RunExportAndUploadAvatarBlueprint(obj);
+				}
+			}
 		}
+
+		// Game Update Loop
+		public void Update() {
+			if (EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode) {
+				// Play Mode
+				// Wait for VRCSDK to load and prevent double-uploading
+				if (Time.frameCount > 500 && isWaitingForPlaymode) {
+					isWaitingForPlaymode = false;
+				} else {
+					return;
+				}
+
+				// Variables
+				Scene scene = SceneManager.GetActiveScene();
+				GameObject[] sceneObjects = scene.GetRootGameObjects();
+				GameObject VRCSDK = sceneObjects.Where(predicate: obj => obj.name.Equals(value: "VRCSDK")).First();
+
+				// Pre-conditions
+				if (VRCSDK == null) {
+					GUILayout.Label(text: "No VRCSDK Found");
+					return;
+				}
+
+				InputField[] inputFields = VRCSDK.GetComponentsInChildren<InputField>();
+				string input = uploadObject.name.Replace(oldValue: SUFFIX, newValue: "");
+				inputFields.First(predicate: f => f.name.Equals(value: "Name Input Field")).SetTextWithoutNotify(input);
+				inputFields.First(predicate: f => f.name.Equals(value: "Description Input Field")).SetTextWithoutNotify(input);
+
+				Toggle[] toggles = VRCSDK.GetComponentsInChildren<Toggle>();
+				toggles.First(predicate: t => t.name.Equals(value: "ToggleWarrant")).isOn = true;
+				if (PLATFORM == "PC") {
+					toggles.First(predicate: t => t.name.Equals(value: "ImageUploadToggle")).isOn = true;
+
+					GameObject gestureManager = sceneObjects.First(predicate: obj => obj.name.Equals(value: "GestureManager"));
+					if (gestureManager != null) {
+						Selection.SetActiveObjectWithContext(obj: gestureManager, context: null);
+					}
+
+					GameObject VRCCam = sceneObjects.First(predicate: obj => obj.name.Equals(value: "VRCCam"));
+					if (VRCCam == null) {
+						GUILayout.Label(text: "No VRCCam Found");
+						return;
+					}
+
+					Animator animator = uploadObject.GetComponent<Animator>();
+					Transform headTransform = animator.GetBoneTransform(humanBoneId: HumanBodyBones.Head);
+					VRCCam.transform.position = new Vector3(x: 0.0f, y: headTransform.position.y, z: headTransform.localScale.z);
+				}
+
+				Button[] buttons = VRCSDK.GetComponentsInChildren<Button>(includeInactive: true);
+				buttons.First(predicate: b => b.name.Equals(value: "UploadButton")).onClick.Invoke();
+			} else if (uploadObject != null) {
+				// Edit Mode
+				uploadObject.SetActive(value: false);
+				uploadObject = null;
+			}
+		}
+
 	}
+
 }

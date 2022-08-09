@@ -63,8 +63,8 @@ namespace ShayBox {
 			Scene scene = SceneManager.GetActiveScene();
 			GameObject[] sceneObjects = scene.GetRootGameObjects();
 			GameObject[] sceneAvatarObjects = sceneObjects.Where(predicate: obj => obj.activeInHierarchy && obj.GetComponent(type: "VRCAvatarDescriptor") != null).ToArray();
-			GameObject[] validAvatarObjects = sceneAvatarObjects.Where(obj => AVATAR_NAMES.Contains(value: obj.name)).ToArray();
-			GameObject[] cloneAvatarObjects = sceneAvatarObjects.Where(obj => !AVATAR_NAMES.Contains(value: obj.name)).ToArray();
+			GameObject[] validAvatarObjects = sceneAvatarObjects.Where(obj => AVATAR_NAMES.Contains(value: obj.name.Replace(oldValue: SUFFIX, newValue: ""))).ToArray();
+			GameObject[] cloneAvatarObjects = sceneAvatarObjects.Where(obj => !AVATAR_NAMES.Contains(value: obj.name.Replace(oldValue: SUFFIX, newValue: ""))).ToArray();
 			GameObject shaysAvatarTool = sceneObjects.First(predicate: obj => obj.name.Equals(value: "Shays Avatar Tool"));
 			VRCAvatarDescriptor shaysAvatarDescriptor = (VRCAvatarDescriptor)shaysAvatarTool.GetComponent(type: "VRCAvatarDescriptor");
 
@@ -81,7 +81,7 @@ namespace ShayBox {
 
 			if (validAvatarObjects.Length > 0 && GUILayout.Button(text: "Scale Active Avatars")) {
 				foreach (GameObject original in validAvatarObjects) {
-					Avatar avatar = AVATARS.First(predicate: avi => avi.name.Equals(value: original.name));
+					Avatar avatar = AVATARS.First(predicate: avi => avi.name.Equals(value: original.name.Replace(oldValue: SUFFIX, newValue: "")));
 					foreach (KeyValuePair<string, double> scale in avatar.scaleDict) {
 						GameObject obj = Instantiate(original);
 						obj.name = obj.name
@@ -109,15 +109,15 @@ namespace ShayBox {
 								desc.baseAnimationLayers[4].animatorController = shaysAvatarDescriptor.baseAnimationLayers[0].animatorController; // FX
 								break;
 							case 1.0:
-								desc.baseAnimationLayers[0].animatorController = shaysAvatarDescriptor.specialAnimationLayers[5].animatorController; // Base
+								desc.baseAnimationLayers[0].animatorController = shaysAvatarDescriptor.specialAnimationLayers[0].animatorController; // Base
 								desc.baseAnimationLayers[4].animatorController = shaysAvatarDescriptor.baseAnimationLayers[1].animatorController; // FX
 								break;
 							case 1.5:
-								desc.baseAnimationLayers[0].animatorController = shaysAvatarDescriptor.specialAnimationLayers[6].animatorController; // Base
+								desc.baseAnimationLayers[0].animatorController = shaysAvatarDescriptor.specialAnimationLayers[1].animatorController; // Base
 								desc.baseAnimationLayers[4].animatorController = shaysAvatarDescriptor.baseAnimationLayers[2].animatorController; // FX
 								break;
 							case 2.0:
-								desc.baseAnimationLayers[0].animatorController = shaysAvatarDescriptor.specialAnimationLayers[7].animatorController; // Base
+								desc.baseAnimationLayers[0].animatorController = shaysAvatarDescriptor.specialAnimationLayers[2].animatorController; // Base
 								desc.baseAnimationLayers[4].animatorController = shaysAvatarDescriptor.baseAnimationLayers[3].animatorController; // FX
 								break;
 							default:

@@ -1,8 +1,9 @@
 # Shays Tools
 
-These are provided as-is, if you'd like to use them you can contact me on Discord (Shay#2000) but they're made for me and likely won't work as you intend.
+These scripts are made for me and provided as-is.  
+Feel free to contact me on Discord: Shay#2000  
 
-- ShaysAvatarTool: Expanded Upload Tool with Scaling
-- ShaysUploadTool: Basic Upload Tool
-- ShaysMassMergeTool: Mass Merge Animation Controllers (Modified MergeTool) for use with AvatarTool
-- ShaysMergeTool: Merge Animation Controllers
+Files:
+- `ShaysUploadTool.cs`: My custom upload tool for thumbnailing.
+- `ShaysMassMergeTool.cs`: Modified ShaysMergeTool.cs for use with `Shays Avatar Tool` prefab.
+- `ShaysMergeTool.cs`: Avatar script to merge layers using `VRLabs Avatar 3.0 Manager`.

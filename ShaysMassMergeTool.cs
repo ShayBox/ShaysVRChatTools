@@ -26,10 +26,16 @@ namespace ShayBox {
 			if (GUILayout.Button(text: "Merge & Override")) {
 				VRCAvatarDescriptor descriptor = data.GetComponent<VRCAvatarDescriptor>();
 				foreach (AnimatorController controllerToAdd in data.layers) {
-					Merge(descriptor, controllerToAdd, playable: PlayableLayer.Base);
-					Merge(descriptor, controllerToAdd, playable: PlayableLayer.Additive);
-					Merge(descriptor, controllerToAdd, playable: PlayableLayer.Gesture);
-					Merge(descriptor, controllerToAdd, playable: PlayableLayer.Action);
+					if (descriptor.baseAnimationLayers[0].animatorController != null)
+						Merge(descriptor, controllerToAdd, playable: PlayableLayer.Base);
+					if (descriptor.baseAnimationLayers[1].animatorController != null)
+						Merge(descriptor, controllerToAdd, playable: PlayableLayer.Additive);
+					if (descriptor.baseAnimationLayers[2].animatorController != null)
+						Merge(descriptor, controllerToAdd, playable: PlayableLayer.Gesture);
+					if (descriptor.baseAnimationLayers[3].animatorController != null)
+						Merge(descriptor, controllerToAdd, playable: PlayableLayer.Action);
+					if (descriptor.baseAnimationLayers[4].animatorController != null)
+						Merge(descriptor, controllerToAdd, playable: PlayableLayer.FX);
 				}
 			}
 		}

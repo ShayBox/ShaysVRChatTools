@@ -28,8 +28,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6954526966989844378}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.04927442, y: 0.86897564, z: -0.07272065}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
-  ViewPosition: {x: 0, y: 1.6, z: 0.2}
+  ViewPosition: {x: 0, y: 0, z: 0}
   Animations: 0
   ScaleIPD: 1
   lipSync: 0
@@ -139,27 +139,27 @@ MonoBehaviour:
     type: 0
     animatorController: {fileID: 0}
     mask: {fileID: 0}
-    isDefault: 1
+    isDefault: 0
   - isEnabled: 0
     type: 2
     animatorController: {fileID: 0}
     mask: {fileID: 0}
-    isDefault: 1
+    isDefault: 0
   - isEnabled: 0
     type: 3
     animatorController: {fileID: 0}
     mask: {fileID: 0}
-    isDefault: 1
+    isDefault: 0
   - isEnabled: 0
     type: 4
     animatorController: {fileID: 0}
     mask: {fileID: 0}
-    isDefault: 1
+    isDefault: 0
   - isEnabled: 0
     type: 5
     animatorController: {fileID: 0}
     mask: {fileID: 0}
-    isDefault: 1
+    isDefault: 0
   specialAnimationLayers:
   - isEnabled: 0
     type: 6
@@ -322,11 +322,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6efbc2bdbfb007418e3a5a526b90dc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseLayer: {fileID: 0}
-  additiveLayer: {fileID: 0}
-  gestureLayer: {fileID: 0}
-  actionLayer: {fileID: 0}
-  fxLayer: {fileID: 0}
+  baseController: {fileID: 0}
+  additiveController: {fileID: 0}
+  gestureController: {fileID: 0}
+  actionController: {fileID: 0}
+  fxController: {fileID: 0}
+  mainControllers: []
+  controllersToAdd: []
 --- !u!114 &1912575546451161567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,4 +341,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fa35cccbad84a247b2f6ed1946cb76c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layers: []
+  baseController: {fileID: 0}
+  additiveController: {fileID: 0}
+  gestureController: {fileID: 0}
+  actionController: {fileID: 0}
+  fxController: {fileID: 0}
+  mainControllers:
+  - {fileID: 0}
+  controllersToAdd:
+  - {fileID: 0}
